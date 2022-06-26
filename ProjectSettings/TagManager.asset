@@ -11,6 +11,7 @@ TagManager:
   - MONSTER
   - HPBAR
   - Clear
+  - Potion
   layers:
   - Default
   - TransparentFX
@@ -18,7 +19,7 @@ TagManager:
   - Clear
   - Water
   - UI
-  - 
+  - Potion
   - 
   - BARREL
   - MONSTER_BODY

@@ -71,6 +71,11 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if(other.CompareTag("Potion"))
+        {
+            moveSpeed += 1;
+            other.gameObject.SetActive(false);
+        }
         if( other.CompareTag("PUNCH") && currHp >= 0.0f)
         {
             currHp -= 10.0f;
