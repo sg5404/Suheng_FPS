@@ -21,8 +21,6 @@ public class EmrMessage : MonoBehaviour
     [SerializeField]
     private Light sun;
     [SerializeField]
-    private Light sun2;
-    [SerializeField]
     private GameObject load;
     [SerializeField]
     private Text padeText;
@@ -31,14 +29,9 @@ public class EmrMessage : MonoBehaviour
     public bool isNight = true;
     public bool isEnd = false;
     private bool isTime = true;
-    private bool day2Clear = false;
-    private bool padeout = false;
-    Color color;
     private float changeTime = 0;
     float timer = 0;
-    float timer2 = 0;
     private bool isOne = false;
-    padeCtrl padectrl;
 
     // Start is called before the first frame update
     void Start()
@@ -46,8 +39,6 @@ public class EmrMessage : MonoBehaviour
         day = 0;
         emrText.gameObject.SetActive(false);
         RenderSettings.fogDensity = 0;
-        color = pade.color;
-        padectrl = GetComponent<padeCtrl>();
         changeTime = 7;
         isTime = false;
         isNight = true;
@@ -57,24 +48,39 @@ public class EmrMessage : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(day == 0)
+        switch (day)
         {
-            pade.gameObject.SetActive(true);
-        }
-        else if(day == 3)
-        {
-            pade.gameObject.SetActive(true);
-            padeText.text = "당신이 골인 지점에 들어간 순간,\n당신은 뒤통수에 둔탁한 충격을 느끼고 쓰러졌습니다.\n일기장의 정보는 잘못되어있었습니다. \n눈을 떠보니 깜깜한 저녘, 하루가 지난 것 같습니다.\n미로에서 빠져나가세요.";
-        }
-        else if(day != 5)
-        {
-            pade.gameObject.SetActive(false);
-        }
-
-        if(day == 6)
-        {
-            //씬체인지
-            SceneManager.LoadScene("Main");
+            case 0:
+                pade.gameObject.SetActive(true);
+                break;
+            case 3:
+                pade.gameObject.SetActive(true);
+                padeText.text = "당신이 골인 지점에 들어간 순간,\n당신은 뒤통수에 둔탁한 충격을 느끼고 쓰러졌습니다.\n일기장의 정보는 잘못되어있었습니다. \n눈을 떠보니 깜깜한 저녘, 하루가 지난 것 같습니다.\n미로에서 빠져나가세요.";
+                break;
+            case 4:
+                if (transform.position.x <= 200)
+                {
+                    pade.gameObject.SetActive(true);
+                    day++;
+                    isNight = false;
+                    padeText.text = "당신은 탈출했으나, 큰 부상을 입어 오래 살지 못합니다.\n당신은 마지막 힘을 다해 오두막으로 돌아가 일기를 씁니다.\n당신의 다음 사람은 이곳을 탈출하길 빌며...";
+                    changeTime = 5;
+                    isTime = false;
+                }
+                else
+                {
+                    pade.gameObject.SetActive(false);
+                }
+                break;
+            case 6:
+                SceneManager.LoadScene("Main");
+                break;
+            default:
+                if(day != 5)
+                {
+                    pade.gameObject.SetActive(false);
+                }
+                break;
         }
 
         if (isTime)
@@ -93,11 +99,7 @@ public class EmrMessage : MonoBehaviour
                         changeTime = 20; //20
                         isTime = false;
                         break;
-                    case 4:
-                        break;
-
                     default:
-
                         break;
                 }
             }
@@ -130,31 +132,7 @@ public class EmrMessage : MonoBehaviour
             }
         }
 
-        if(isNight)
-        {
-            if(RenderSettings.fogDensity < 0.07f)
-            {
-                Fog(0.0007f);
-            }
-        }
-        else
-        {
-            if (RenderSettings.fogDensity > 0)
-            {
-                Fog(-0.0014f);
-            }
-        }
-
-        if(day == 4 && transform.position.x <= 200)
-        {
-            pade.gameObject.SetActive(true);
-            day++;
-            isNight = false;
-            padeText.text = "당신은 탈출했으나, 큰 부상을 입어 오래 살지 못합니다.\n당신은 마지막 힘을 다해 오두막으로 돌아가 일기를 씁니다.\n당신의 다음 사람은 이곳을 탈출하길 빌며...";
-            changeTime = 5;
-            isTime = false;
-        }
-
+        Fog();
 
         if (changeTime <= 0 && !isTime)
         {
@@ -164,7 +142,6 @@ public class EmrMessage : MonoBehaviour
                 {
                     isNight = false;
                     sun.gameObject.SetActive(true);
-                    //sun2.gameObject.SetActive(true);
                 }
                 isTime = true;
                 day++;
@@ -174,7 +151,6 @@ public class EmrMessage : MonoBehaviour
                 isNight = true;
                 isTime = true;
                 sun.gameObject.SetActive(false);
-                //sun2.gameObject.SetActive(false);
                 load.SetActive(false);
             }
         }
@@ -191,7 +167,25 @@ public class EmrMessage : MonoBehaviour
 
     }
 
-    void Fog(float num)
+    void Fog()
+    {
+        if (isNight)
+        {
+            if (RenderSettings.fogDensity < 0.07f)
+            {
+                Fogplus(0.0007f);
+            }
+        }
+        else
+        {
+            if (RenderSettings.fogDensity > 0)
+            {
+                Fogplus(-0.0014f);
+            }
+        }
+    }
+
+    void Fogplus(float num)
     {
         timer += Time.deltaTime;
         if (timer > 0.1)
@@ -207,13 +201,9 @@ public class EmrMessage : MonoBehaviour
         {
             if (other.CompareTag("Clear"))
             {
-                Debug.Log("b");
                 day++;
                 changeTime = 10;
                 isOne = true;
-                //padectrl.PadeIn();
-                //페이드인
-                //위치 변경
             }
         }
     }
